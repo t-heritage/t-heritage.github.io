@@ -1,0 +1,30 @@
+<header class="nav">
+  <div class="brand">
+    <a class="title" href="/" aria-label="Darwin 1942 home"><img src="/images/logo-pacific-star.webp" width="1540" height="510" alt="Darwin 1942: The Forgotten War That Reshaped Australia" style="display:block;width:clamp(130px, 12vw, 190px);height:auto;"></a>
+  </div>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">&#9776;</button>
+  <nav>
+    <ul id="nav-menu">
+      <li class="has-dropdown">
+        <a class="nav-parent" tabindex="0">ABOUT</a>
+        <ul class="dropdown">
+          <li><a href="/the-story">THE STORY</a></li>
+          <li><a href="/about-the-film">ABOUT THE FILM</a></li>
+          {% comment %} The shared nav is used by every Jekyll-built page, so the current
+             item is worked out from the URL rather than hard-coded. {% endcomment %}
+          <li{% if page.url contains "/media-releases/" %} class="active"{% endif %}><a href="/media-releases/">MEDIA RELEASES</a></li>
+          <li{% if page.url contains "/news-and-media/" %} class="active"{% endif %}><a href="/news-and-media/">NEWS AND MEDIA</a></li>
+        </ul>
+      </li>
+      <li><a href="/community-impact">COMMUNITY IMPACT</a></li>
+      <li><a href="/get-involved">RSL</a></li>
+      <li><a href="/veteran-stories">VETERAN STORIES</a></li>
+      <li><a href="/contact">CONTACT</a></li>
+      <li><a href="/subscribe">SUBSCRIBE</a></li>
+      <li class="nav-cta">
+        <a class="nav-cta-btn" href="/donate">DONATE</a>
+        <div class="nav-cta-note">Commemorating the 85th anniversary of the Bombing of Darwin &middot; Free digital licences for RSL Sub Branches &amp; Clubs &middot; Nationwide release 2027</div>
+      </li>
+    </ul>
+  </nav>
+</header>

@@ -1,0 +1,154 @@
+---
+layout: default
+title: News and Media
+description: Press coverage, interviews and articles about Darwin 1942, the feature-length commemorative documentary marking the 85th anniversary of the Bombing of Darwin.
+permalink: /news-and-media/
+---
+{% comment %}
+Items on this page come from a Google Sheet the client maintains, published to the
+web as CSV. The address of that sheet is `news_csv_url` in /_config.yml — that is the
+only thing that ever needs editing here. The fetch and parsing live in
+/assets/news-feed.js, shared with the home page. Column names and setup: README.md
+in this folder.
+{% endcomment %}
+<section class="page-hero">
+  <img class="page-hero-bg" src="/images/background.webp" alt="Darwin 1942">
+  <div class="page-hero-overlay"></div>
+  <div class="page-hero-content">
+    <div class="hero-label">ABOUT</div>
+    <h1>NEWS AND MEDIA</h1>
+    <p class="hero-sub">Coverage of Darwin 1942 in the press, in print and on air.</p>
+  </div>
+</section>
+
+<section class="content-section dark">
+  <div class="content-wrap release-wrap">
+    <div class="section-label">In the Media</div>
+    <h2 class="section-heading">DARWIN 1942 IN THE MEDIA</h2>
+
+    <div class="news-list" id="news-list">
+      <p class="news-status" id="news-status">Loading the latest coverage&hellip;</p>
+    </div>
+
+    <div class="media-contact">
+      <h3>MEDIA ENQUIRIES</h3>
+      <p>Journalists and media outlets are welcome to cover this project. For interviews, images or further information, please <a href="/contact">contact us</a> or call <a href="tel:+61299669596">02 9966 9596</a>.</p>
+      <p>Our official announcements are published as <a href="/media-releases/">media releases</a>.</p>
+    </div>
+  </div>
+</section>
+
+<div class="cta-strip">
+  <h2>PARTNER WITH DARWIN 1942</h2>
+  <a class="btn" href="/get-involved">GET INVOLVED</a>
+</div>
+
+<script src="/assets/news-feed.js"></script>
+<script>
+/* News and media list.
+   The rows come from the client's Google Sheet through /assets/news-feed.js (one
+   copy of the fetch, parse and date logic, shared with the home page). This file
+   only decides how a full item is laid out. */
+(function () {
+  var listEl = document.getElementById('news-list');
+  var EMPTY = 'Media coverage of Darwin 1942 will be published here.';
+
+  function status(msg) {
+    listEl.innerHTML = '';
+    var p = document.createElement('p');
+    p.className = 'news-status';
+    p.textContent = msg;
+    listEl.appendChild(p);
+  }
+
+  if (!window.DarwinNews || !DarwinNews.configured) {
+    status(EMPTY);
+    return;
+  }
+
+  function el(tag, className, text) {
+    var n = document.createElement(tag);
+    if (className) n.className = className;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+
+  function render(items) {
+    listEl.innerHTML = '';
+    items.forEach(function (it) {
+      var article = el('article', 'news-item' + (it.image ? '' : ' no-image'));
+
+      if (it.image) {
+        var imgWrap = it.url ? el('a') : el('div');
+        if (it.url) {
+          imgWrap.href = it.url;
+          imgWrap.target = '_blank';
+          imgWrap.rel = 'noopener noreferrer';
+        }
+        var img = el('img', 'news-thumb');
+        img.src = it.image;
+        img.alt = it.title || '';
+        img.loading = 'lazy';
+        DarwinNews.groundFor(img, it.image);
+        /* A masthead that blocks hotlinking should not leave a broken frame. */
+        img.addEventListener('error', function () {
+          article.classList.add('no-image');
+          imgWrap.remove();
+        });
+        imgWrap.appendChild(img);
+        article.appendChild(imgWrap);
+      }
+
+      var body = el('div');
+
+      /* The date sits above the headline; the source sits under it. */
+      if (it.dateLabel) {
+        var meta = el('div', 'news-meta');
+        meta.appendChild(el('span', null, it.dateLabel));
+        body.appendChild(meta);
+      }
+
+      var h3 = el('h3', 'news-title');
+      if (it.url) {
+        var a = el('a', null, it.title);
+        a.href = it.url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        h3.appendChild(a);
+      } else {
+        h3.textContent = it.title;
+      }
+      body.appendChild(h3);
+
+      /* The programme or masthead, under the headline. The Type column is not shown —
+         it only decides what the button says. */
+      if (it.publication) body.appendChild(el('p', 'news-source', it.publication));
+
+      if (it.summary) body.appendChild(el('p', 'news-summary', it.summary));
+
+      if (it.url) {
+        var actions = el('div', 'news-actions');
+        var btn = el('a', 'btn', it.cta);
+        btn.href = it.url;
+        btn.target = '_blank';
+        btn.rel = 'noopener noreferrer';
+        actions.appendChild(btn);
+        body.appendChild(actions);
+      }
+
+      article.appendChild(body);
+      listEl.appendChild(article);
+    });
+  }
+
+  DarwinNews.load()
+    .then(function (items) {
+      if (!items.length) { status(EMPTY); return; }
+      render(items);
+    })
+    .catch(function (err) {
+      if (window.console) console.error('News and media list could not be loaded:', err);
+      status('This list is temporarily unavailable. Please check back shortly, or contact us for media enquiries.');
+    });
+})();
+</script>
